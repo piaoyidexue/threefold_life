@@ -1,0 +1,47 @@
+#base "heroes/meepo.kv"
+
+"DOTAAbilities"
+{
+    // =========================================================================
+    // 圣焰守护者被动：命运连结
+    // =========================================================================
+    "Ability_Guardian_Passive"
+    {
+        "BaseClass"             "ability_datadriven"
+        "AbilityBehavior"       "DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_HIDDEN"
+        "AbilityTextureName"    "omniknight_guardian_angel"
+        "MaxLevel"              "1"
+
+        "Modifiers"
+        {
+            "modifier_guardian_passive"
+            {
+                "Passive"           "1"
+                "IsHidden"          "0"
+                "Attributes"        "MODIFIER_ATTRIBUTE_PERMANENT"
+                // GDD: 可以在这里添加一些基础属性，比如回蓝等
+            }
+        }
+    }
+
+    // =========================================================================
+    // 暗影潜行者被动：灵魂寄生
+    // =========================================================================
+    "Ability_Traitor_Passive"
+    {
+        "BaseClass"             "ability_datadriven"
+        "AbilityBehavior"       "DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_HIDDEN"
+        "AbilityTextureName"    "shadow_demon_soul_catcher"
+        "MaxLevel"              "1"
+
+        "Modifiers"
+        {
+            "modifier_traitor_passive"
+            {
+                "Passive"           "1"
+                "IsHidden"          "0"
+                "Attributes"        "MODIFIER_ATTRIBUTE_PERMANENT"
+            }
+        }
+    }
+}
