@@ -1,6 +1,7 @@
-import { GAME_SETTINGS } from "../settings";
-import { RoleManager } from "./RoleManager";
+import {GAME_SETTINGS} from "../settings";
+import {RoleManager} from "./RoleManager";
 import {RadianceSystem} from "./RadianceSystem";
+import {Spawner} from "./Spawner";
 
 export class GameLoop {
     public currentDay: number = 1;
@@ -25,6 +26,16 @@ export class GameLoop {
             this.OnThink();
             return 1;
         });
+        this.SpawnBase();
+        Spawner.Init(); // 初始化寻找基地
+    }
+
+
+    private SpawnBase() {
+        const basePos = Vector(0, 0, 0); // 或者 Entities.FindByName(..., "sacred_flame_pos")
+        const baseUnit = CreateUnitByName("npc_sacred_flame", basePos, true, undefined, undefined, DotaTeam.GOODGUYS);
+        // 移除无敌 buff (有些塔默认无敌)
+        baseUnit.RemoveModifierByName("modifier_invulnerable");
     }
 
     private OnThink() {
@@ -46,7 +57,12 @@ export class GameLoop {
                 // 第15天进入决战，不再切换昼夜，直到BOSS死亡或基地爆炸
                 return;
             }
-
+            // 如果是第14天结束，进入第15天
+            if (!this.isDayTime && this.currentDay === GAME_SETTINGS.MAX_DAYS - 1) {
+                this.currentDay++;
+                this.StartFinalBattle();
+                return;
+            }
             if (this.isDayTime) {
                 this.StartNightPhase();
             } else {
@@ -63,7 +79,7 @@ export class GameLoop {
 
         // 设置 Dota 原生白天
         GameRules.SetTimeOfDay(0.25); // 0.25 是早晨
-
+        Spawner.StopWave(); // 停止刷怪
         // GDD: 开启审判台，野区刷新
         // TODO: EnableShrines();
         // TODO: EnableTribunal();
@@ -81,6 +97,9 @@ export class GameLoop {
         this.TeleportAllToBase();
         // TODO: SpawnWave(this.currentDay);
         // TODO: DisableTribunal();
+        if (this.currentDay < GAME_SETTINGS.MAX_DAYS) {
+            Spawner.StartNightWave(this.currentDay);
+        }
     }
 
     private TeleportAllToBase() {
@@ -100,6 +119,22 @@ export class GameLoop {
                 }
             }
         }
+    }
+
+    private StartFinalBattle() {
+        print("[GameLoop] FINAL BATTLE STARTED");
+        this.isDayTime = false; // 决战通常是黑夜或特殊天气
+        GameRules.SetTimeOfDay(0.75);
+
+        Spawner.StopWave(); // 清理旧循环
+        Spawner.SpawnFinalBoss();
+
+        // UI 通知
+        CustomGameEventManager.Send_ServerToAllClients("s2c_update_timer", {
+            time: 9999, // 不限时
+            is_day: false,
+            day_count: 15
+        });
     }
 }
 

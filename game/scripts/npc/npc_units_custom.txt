@@ -1,0 +1,85 @@
+"DOTAUnits"
+{
+    // =========================================================================
+    // 基础怪物 (Day 1-14)
+    // =========================================================================
+    "npc_creep_melee"
+    {
+        "BaseClass"             "npc_dota_creature"
+        "Model"                 "models/creeps/lane_creeps/creep_bad_melee/creep_bad_melee.vmdl"
+        "ModelScale"            "1.0"
+        "Level"                 "1"
+        "HealthBarOffset"       "140"
+        "BountyGoldMin"         "30"
+        "BountyGoldMax"         "35"
+        "BountyXP"              "40"
+
+        "StatusHealth"          "500"
+        "StatusHealthRegen"     "1.0"
+        "StatusMana"            "0"
+        "MovementSpeed"         "325"
+
+        "AttackCombatType"      "DOTA_COMBAT_TYPE_MELEE"
+        "AttackDamageMin"       "20"
+        "AttackDamageMax"       "25"
+        "AttackRate"            "1.0"
+        "AttackRange"           "100"
+        "AttackAcquisitionRange" "800" // 仇恨范围
+
+        "ArmorPhysical"         "2"
+        "MagicalResistance"     "0"
+
+        "TeamName"              "DOTA_TEAM_BADGUYS" // 敌对阵营
+        "CombatClassAttack"     "DOTA_COMBAT_CLASS_ATTACK_BASIC"
+        "CombatClassDefend"     "DOTA_COMBAT_CLASS_DEFEND_BASIC"
+    }
+
+    // =========================================================================
+    // 最终 Boss (Day 15)
+    // =========================================================================
+    "npc_boss_final"
+    {
+        "BaseClass"             "npc_dota_creature"
+        "Model"                 "models/heroes/doom/doom.vmdl"
+        "ModelScale"            "2.5"
+        "Level"                 "25"
+        "HealthBarOffset"       "300"
+
+        "BountyGoldMin"         "10000"
+        "BountyGoldMax"         "10000"
+        "BountyXP"              "10000"
+
+        "StatusHealth"          "50000" // 根据玩家强度调整
+        "StatusHealthRegen"     "50.0"
+        "MovementSpeed"         "350"
+
+        "AttackCombatType"      "DOTA_COMBAT_TYPE_MELEE"
+        "AttackDamageMin"       "500"
+        "AttackDamageMax"       "600"
+        "AttackRate"            "1.5"
+        "AttackRange"           "200"
+
+        "ArmorPhysical"         "20"
+        "MagicalResistance"     "50"
+
+        "TeamName"              "DOTA_TEAM_BADGUYS"
+        "Creature"              "1"
+    }
+
+    // =========================================================================
+    // 基地：圣焰
+    // =========================================================================
+    "npc_sacred_flame"
+    {
+        "BaseClass"             "npc_dota_building" // 或 creature
+        "Model"                 "models/props_structures/tower_good.vmdl" // 临时模型
+        "ModelScale"            "1.5"
+        "Level"                 "1"
+        "HealthBarOffset"       "300"
+
+        "StatusHealth"          "10000"
+        "StatusHealthRegen"     "5.0"
+
+        "TeamName"              "DOTA_TEAM_GOODGUYS"
+    }
+}

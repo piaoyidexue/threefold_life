@@ -4,6 +4,7 @@ import {GameLoopInstance} from "./manager/GameLoop";
 import {RadianceSystem} from "./manager/RadianceSystem";
 import {XPFilter} from "./filters/XPFilter";
 import {DamageFilter} from "./filters/DamageFilter";
+import {JudgmentSystem} from "./manager/JudgmentSystem";
 
 
 declare global {
@@ -33,7 +34,10 @@ export class GameMode {
         this.RegisterEvents();
 
         RadianceSystem.Init(); // 初始化光辉
+        JudgmentSystem.Init(); // 初始化事件监听
+
     }
+
 
     private RegisterFilters() {
         const mode = GameRules.GetGameModeEntity();
@@ -81,6 +85,7 @@ export class GameMode {
     private RegisterEvents() {
         ListenToGameEvent("game_rules_state_change", () => this.OnStateChange(), undefined);
         ListenToGameEvent("npc_spawned", (event) => this.OnNPCSpawned(event), undefined);
+        ListenToGameEvent("entity_killed", (event) => this.OnEntityKilled(event), undefined);
     }
 
     private OnStateChange() {
@@ -97,4 +102,27 @@ export class GameMode {
             // 可以在这里处理英雄重生逻辑
         }
     }
+
+    private OnEntityKilled(event: EntityKilledEvent) {
+        const killed = EntIndexToHScript(event.entindex_killed) as CDOTA_BaseNPC;
+
+        // 只有杀怪才加光辉
+        if (killed.GetTeamNumber() === DotaTeam.BADGUYS) {
+            let amount = 0.5; // 普通怪
+
+            if (killed.GetUnitName() === "npc_boss_final") {
+                amount = 100; // Boss 死了直接满或者胜利
+                GameRules.SetGameWinner(DotaTeam.GOODGUYS); // 简单的胜利判定
+            }
+            // 可以判断是否是精英怪
+
+            RadianceSystem.ModifyRadiance(amount);
+        }
+
+        // GDD: 圣焰被毁，游戏失败
+        if (killed.GetUnitName() === "npc_sacred_flame") {
+            GameRules.SetGameWinner(DotaTeam.BADGUYS);
+        }
+    }
+
 }

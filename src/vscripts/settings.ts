@@ -7,6 +7,9 @@ export const GAME_SETTINGS = {
     MAX_DAYS: 15,                   // 最大天数
     INITIAL_GOLD: 600,              // 初始金币
     BASE_RADIANCE: 100,             // 初始光辉
+    VOTE_DURATION: 30.0,            // 投票持续时间
+    VOTE_COST: 25,                  // 发起投票消耗光辉
+    VOTE_PENALTY: 30,               // 投错惩罚光辉
 };
 
 

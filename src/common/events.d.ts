@@ -18,6 +18,13 @@ interface CustomGameEventDeclarations {
     c2s_vote_start: { target_index: PlayerID };
     s2c_update_timer: { time: number; is_day: boolean; day_count: number };
     s2c_update_radiance: { value: number };
+    // Client -> Server
+    c2s_start_vote: { target_index: EntityIndex }; // 发起投票
+    c2s_cast_vote: { vote_result: boolean };       // 投票 (同意/反对)
+    create_error_message: { message: string }
+    // Server -> Client
+    s2c_vote_started: { initiator: PlayerID; target: PlayerID; duration: number };
+    s2c_vote_ended: { result: string; target: PlayerID }; // result: "passed" | "failed"
 }
 
 // Define the type of data sent by the example_event event
