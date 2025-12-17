@@ -1,0 +1,28 @@
+src/vscripts/
+└── modules/
+    └── ai_framework/          // [独立模块] 你的核心资产
+        ├── index.ts           // 模块入口 (负责初始化和加载)
+        ├── Constants.ts       // 全局配置 (权重、距离阈值)
+        │
+        ├── Core/              // [纯逻辑层] 100% 可移植，一行代码不用改
+        │   ├── IBotUnit.ts    // [接口] 定义单位该有的样子
+        │   ├── Blackboard.ts  // [协同] 团队黑板、连招锁
+        │   └── MathUtils.ts   // [数学] 效用曲线 (Logistic/Linear curves)
+        │
+        ├── Adapter/           // [脏活累活层] 只有这里依赖 Dota API
+        │   ├── DotaBotUnit.ts // [实现] IBotUnit 的 Dota版实现
+        │   ├── WorldState.ts  // [感知] 封装 FindUnitsInRadius / 技能CD读取
+        │   └── NavSystem.ts   // [导航] 封装寻路和避让
+        │
+        ├── Decision/          // [大脑层] 决定“做什么”
+        │   ├── ActionBase.ts  // 动作基类
+        │   ├── Evaluator.ts   // 评分器 (遍历所有动作选最高分)
+        │   └── Actions/       // 具体动作实现
+        │       ├── Action_ChainStun.ts    // 完美接控
+        │       ├── Action_Kite.ts         // 走A拉扯
+        │       ├── Action_Positioning.ts  // 团战站位
+        │       └── Action_SaveAlly.ts     // 救人逻辑
+        │
+        └── Director/          // [指挥层] 宏观调度
+            ├── TeamDirector.ts  // 战力计算与战术下达
+            └── SquadLogic.ts    // 小队战术 (如3人抓单)
