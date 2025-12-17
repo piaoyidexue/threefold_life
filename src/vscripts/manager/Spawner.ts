@@ -1,33 +1,24 @@
+import {GameLoop} from "./GameLoop";
+
 export class Spawner {
     private static spawnTimer: string | null = null;
-    private static baseEntity: CDOTA_BaseNPC | null = null;
-
     // 刷怪点名称列表 (需要在 Hammer 地图中放置 info_target 实体并命名)
     private static spawnPointNames: string[] = ["spawner_1", "spawner_2", "spawner_3", "spawner_4"];
 
+    private static pendingBuffs: string[] = [];
     /**
      * 初始化：寻找基地实体
      */
     public static Init() {
-        // 查找所有建筑类型的实体
-        const ent = Entities.FindByName(undefined, "npc_dota_building");
-
-        if (ent) {
-            // =========================================================
-            // 修复点：强制转换为 CDOTA_BaseNPC 才能调用 GetUnitName
-            // =========================================================
-            const unit = ent as CDOTA_BaseNPC;
-            if (unit.GetUnitName() === "npc_sacred_flame") {
-                this.baseEntity = unit;
-                print("[Spawner] Sacred Flame found!");
-            }
-        }
-
-        if (!this.baseEntity) {
-            print("[Spawner] WARNING: Sacred Flame NOT found! Creeps will stay idle.");
+        // 仅仅做一些刷怪点的检查
+        if (!GameLoop.sacredFlameEntity || GameLoop.sacredFlameEntity.IsNull()) {
+            print("[Spawner] CRITICAL: Base entity not defined in GameLoop!");
         }
     }
 
+    public static AddNextWaveBuff(modifierName: string) {
+        this.pendingBuffs.push(modifierName);
+    }
     /**
      * 开始夜晚刷怪 (循环)
      * @param day 当前天数
@@ -61,6 +52,7 @@ export class Spawner {
             Timers.RemoveTimer(this.spawnTimer);
             this.spawnTimer = null;
         }
+        this.pendingBuffs = []; // 一波结束，Buff 清零
         print("[Spawner] Wave Stopped");
     }
 
@@ -87,6 +79,10 @@ export class Spawner {
     private static SpawnUnit(unitName: string, position: Vector, multiplier: number): CDOTA_BaseNPC {
         const unit = CreateUnitByName(unitName, position, true, undefined, undefined, DotaTeam.BADGUYS);
 
+        // 应用暂存的 Buff
+        for (const buff of this.pendingBuffs) {
+            unit.AddNewModifier(undefined, undefined, buff, {});
+        }
         // 应用难度强化
         if (multiplier > 1) {
             const hp = unit.GetMaxHealth() * multiplier;
@@ -99,13 +95,14 @@ export class Spawner {
             unit.SetBaseDamageMin(dmgMin);
             unit.SetBaseDamageMax(dmgMax);
         }
+        const target = GameLoop.sacredFlameEntity;
 
         // 命令进攻基地
-        if (this.baseEntity && this.baseEntity.IsAlive()) {
+        if (target && target.IsAlive()) {
             ExecuteOrderFromTable({
                 UnitIndex: unit.entindex(),
                 OrderType: UnitOrder.ATTACK_MOVE,
-                Position: this.baseEntity.GetAbsOrigin(),
+                Position: target.GetAbsOrigin(),
                 Queue: false,
             });
         }

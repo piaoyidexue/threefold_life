@@ -44,4 +44,25 @@
             }
         }
     }
+    // =========================================================================
+    // 内奸变身技能
+    // =========================================================================
+    "Ability_Traitor_Transform"
+    {
+        "BaseClass"             "ability_datadriven"
+        "AbilityBehavior"       "DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_IMMEDIATE"
+        "AbilityTextureName"    "nevermore_dark_lord" // 影魔图标
+        "MaxLevel"              "1"
+        "Cooldown"              "180.0"
+        "ManaCost"              "0"
+
+        "OnSpellStart"
+        {
+            "RunScript"
+            {
+                "ScriptFile"    "vscripts/abilities/traitor_abilities.lua"
+                "Function"      "OnTraitorTransform"
+            }
+        }
+    }
 }

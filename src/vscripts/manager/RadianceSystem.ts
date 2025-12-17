@@ -25,9 +25,7 @@ export class RadianceSystem {
 
     private static UpdateNetTable() {
         // 将数据发送到前端，供 Panorama UI 读取
-        CustomNetTables.SetTableValue("game_state", "radiance", {
-            value: this.currentValue
-        });
+        CustomNetTables.SetTableValue("game_state", "radiance",            this.currentValue        );
     }
 
     private static CheckThresholds() {

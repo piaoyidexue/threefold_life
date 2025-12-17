@@ -25,6 +25,7 @@ interface CustomGameEventDeclarations {
     // Server -> Client
     s2c_vote_started: { initiator: PlayerID; target: PlayerID; duration: number };
     s2c_vote_ended: { result: string; target: PlayerID }; // result: "passed" | "failed"
+    c2s_buy_shadow_item: { item_id: string};
 }
 
 // Define the type of data sent by the example_event event

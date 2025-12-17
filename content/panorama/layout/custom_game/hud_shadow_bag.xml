@@ -1,0 +1,43 @@
+<root>
+    <styles>
+        <include src="s2r://panorama/styles/dotastyles.vcss_c" />
+        <include src="file://{resources}/styles/hud_shadow_bag.css" />
+    </styles>
+    <scripts>
+        <include src="file://{resources}/scripts/hud_shadow_bag.js" />
+    </scripts>
+
+    <!-- 默认隐藏，JS检测到身份后移除 Hidden 类 -->
+    <Panel id="ShadowBagRoot" class="ShadowBagRoot Hidden" hittest="false">
+
+        <!-- 碎片计数器 -->
+        <Panel class="ShardCounter">
+            <Panel class="ShardIcon" />
+            <Label id="ShardLabel" text="0" />
+        </Panel>
+
+        <!-- 商店列表 -->
+        <Panel class="ShopGrid">
+            <!-- 暴击卡 -->
+            <Button class="ShopItem" onactivate="BuyItem('item_buff_crit')">
+                <Image src="file://{images}/items/daedalus.png" />
+                <Label class="Cost" text="500" />
+                <Label class="Desc" text="Creep Crit" />
+            </Button>
+
+            <!-- 急速卡 -->
+            <Button class="ShopItem" onactivate="BuyItem('item_buff_speed')">
+                <Image src="file://{images}/items/phase_boots.png" />
+                <Label class="Cost" text="500" />
+                <Label class="Desc" text="Creep Haste" />
+            </Button>
+
+            <!-- 守卫 -->
+            <Button class="ShopItem" onactivate="BuyItem('item_shadow_ward')">
+                <Image src="file://{images}/items/ward_observer.png" />
+                <Label class="Cost" text="200" />
+                <Label class="Desc" text="Vision" />
+            </Button>
+        </Panel>
+    </Panel>
+</root>

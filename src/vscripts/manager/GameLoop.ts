@@ -8,6 +8,7 @@ export class GameLoop {
     public isDayTime: boolean = true;
     public isGameEnded: boolean = false;
     private timer: number = 0;
+    public static sacredFlameEntity: CDOTA_BaseNPC | null = null;
 
     constructor() {
         print("[GameLoop] Initialized");
@@ -36,6 +37,10 @@ export class GameLoop {
         const baseUnit = CreateUnitByName("npc_sacred_flame", basePos, true, undefined, undefined, DotaTeam.GOODGUYS);
         // 移除无敌 buff (有些塔默认无敌)
         baseUnit.RemoveModifierByName("modifier_invulnerable");
+        // 赋值给静态变量
+        GameLoop.sacredFlameEntity = baseUnit;
+
+        print("[GameLoop] Base Entity Created and Cached.");
     }
 
     private OnThink() {

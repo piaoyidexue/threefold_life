@@ -1,5 +1,7 @@
 // src/vscripts/classes/RoleManager.ts
 
+import {NetTableManager} from "../utils/NetTableManager";
+
 export enum RoleType {
     GUARDIAN = 0, // 圣焰守护者
     TRAITOR = 1,  // 暗影潜行者
@@ -10,6 +12,56 @@ export class RoleManager {
     // 存储玩家ID -> 身份的映射
     private static playerRoles: Map<PlayerID, RoleType> = new Map();
     private static stolenXP: number = 0;
+    private static shadowShards: number = 0; // 内奸当前的碎片数
+    public static Init() {
+        // 开启自然增长定时器 (每秒 +2)
+        Timers.CreateTimer(1, () => {
+            if (this.IsTraitorAlive()) {
+                this.ModifyShards(2);
+            }
+            return 1;
+        });
+    }
+
+    public static ModifyShards(amount: number) {
+        this.shadowShards += amount;
+
+        // 更新 NetTable 供 UI 显示
+        // 为了安全，我们最好只把这个数据发给内奸玩家，但简单起见先写进 NetTable
+        // 并在前端做显示过滤，或者使用 Send_ServerToPlayer 更新
+
+        NetTableManager.SetPlayerData(attacker.GetPlayerID(), { shadow_shards: this.shadowShards })
+    }
+
+    public static GetShards(): number {
+        return this.shadowShards;
+    }
+
+    // 处理补刀/反补获取碎片
+    public static OnUnitKilled(victim: CDOTA_BaseNPC, attacker: CDOTA_BaseNPC) {
+        if (!attacker || !attacker.IsRealHero()) return;
+
+        // 只有内奸补刀才算
+        if (this.IsTraitor(attacker)) {
+            let amount = 0;
+
+            // 补刀敌方单位
+            if (victim.GetTeamNumber() !== attacker.GetTeamNumber()) {
+                amount = 5;
+            }
+            // 反补友方单位 (Dota2 中反补通常也视为 attacker 是自己)
+            else {
+                amount = 10; // 反补奖励更高
+            }
+
+            if (amount > 0) {
+                this.ModifyShards(amount);
+                // 飘字特效
+                SendOverheadEventMessage(undefined, OverheadAlert.GOLD, attacker, amount, undefined);
+            }
+        }
+    }
+
     public static AssignRoles() {
         print("[RoleManager] Assigning Roles...");
 
@@ -60,6 +112,7 @@ export class RoleManager {
             }
         }
     }
+
     /**
      * 判断某个英雄是否是内奸
      */
@@ -67,6 +120,7 @@ export class RoleManager {
         const pid = hero.GetPlayerID();
         return this.playerRoles.get(pid) === RoleType.TRAITOR;
     }
+
     /**
      * 判断某个英雄是否是守护者
      */
@@ -75,6 +129,7 @@ export class RoleManager {
         const pid = entity.GetPlayerID();
         return this.playerRoles.get(pid) === RoleType.GUARDIAN;
     }
+
     /**
      * 检测内奸是否存活 (用于暗影锁判定)
      */
@@ -91,6 +146,7 @@ export class RoleManager {
         }
         return false;
     }
+
     // GDD: 经验截流相关方法
     public static AddStolenXP(amount: number) {
         this.stolenXP += amount;
