@@ -101,4 +101,41 @@ export class WorldState {
 
         return null;
     }
+    /**
+     * [新增] 寻找最需要救援的队友
+     * @param observer 施法者
+     * @param range 施法距离
+     * @returns { unit: IBotUnit, urgency: number } urgency 越高越危急
+     */
+    public static getAllyInDanger(observer: IBotUnit, range: number): IBotUnit | null {
+        const allies = this.GetAllies(observer, range);
+        let target: IBotUnit | null = null;
+        let maxUrgency = -1;
+
+        for (const ally of allies) {
+            // 不救自己（自保逻辑由 Action_Retreat 处理），也不救满血的
+            if (ally.getHandle() === observer.getHandle()) continue;
+
+            const hpPct = ally.getHealthPercent();
+            if (hpPct > 0.4) continue; // 血量健康，略过
+
+            // 计算危机程度
+            // 基础分：血越少分越高
+            let urgency = (1.0 - hpPct) * 100;
+
+            // 如果被晕住了，危机感加倍
+            if (ally.isStunned()) urgency += 50;
+
+            // 简单的“周围有多少敌人”检测 (需要 Adapter 提供 getNearbyEnemies)
+            // 这里简化逻辑：血量极低(20%)时优先级极高
+            if (hpPct < 0.2) urgency += 50;
+
+            if (urgency > maxUrgency) {
+                maxUrgency = urgency;
+                target = ally;
+            }
+        }
+
+        return target;
+    }
 }

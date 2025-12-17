@@ -11,6 +11,10 @@ export interface IBotUnit {
     getMana(): number;
     getName(): string;
     getAttackRange():number;
+
+    getAttackAnimationPoint(): number; // 获取攻击前摇时间 (秒)
+    getSecondsPerAttack(): number;     // 获取攻击间隔 (秒)
+    getLastAttackTime(): number;       // 获取上次攻击的时间戳
     // 状态查询
     isAlive(): boolean;
     isStunned(): boolean;

@@ -17,6 +17,21 @@ export class DotaBotUnit implements IBotUnit {
     getAttackRange():number{
         return this.unit.Script_GetAttackRange();
     }
+
+    getAttackAnimationPoint(): number {
+        return this.unit.GetAttackAnimationPoint();
+    }
+
+    getSecondsPerAttack(): number {
+        // 攻击间隔 = 基础攻击速度 / (攻速加成/100)
+        // Dota API 直接给出了每秒攻击次数，取倒数即可，或者直接用 GetSecondsPerAttack
+        return this.unit.GetSecondsPerAttack(false);
+    }
+
+    getLastAttackTime(): number {
+        return this.unit.GetLastAttackTime();
+    }
+
     isAlive(): boolean { return this.unit.IsAlive(); }
     isStunned(): boolean { return this.unit.IsStunned() || this.unit.IsHexed(); }
     isChanneling(): boolean { return this.unit.IsChanneling(); }
@@ -51,6 +66,13 @@ export class DotaBotUnit implements IBotUnit {
     }
 
     getAbilityData(abilityName: string) {
+        if (abilityName === "attack") {
+            return {
+                isReady: this.isAttackReady(), // 之前实现的
+                range: this.unit.Script_GetAttackRange(),
+                castPoint: this.unit.GetAttackAnimationPoint()
+            };
+        }
         const ability = this.unit.FindAbilityByName(abilityName);
         if (!ability) return null;
 

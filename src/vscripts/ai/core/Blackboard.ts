@@ -1,8 +1,35 @@
 import { IBotUnit } from "./IBotUnit";
 import { TeamState } from "../Constants";
 
+export interface TacticalSignal {
+    sourceUnit: IBotUnit;      // 谁发起的
+    triggerName: string;       // 触发技能名 (如 tidehunter_ravage)
+    location: Vector;          // 发生地点 (用于接AOE)
+    mainTarget?: IBotUnit;     // 主要目标 (用于接单体控制)
+    timestamp: number;         // 发生时间
+}
 export class Blackboard {
     private static instance: Blackboard;
+
+    // 当前活跃的战术信号
+    public activeSignal: TacticalSignal | null = null;
+    /**
+     * 广播战术信号：我开团了！大家跟上！
+     */
+    public broadcastSignal(signal: TacticalSignal) {
+        this.activeSignal = signal;
+
+        // 信号有效期通常很短 (例如 3秒内有效)
+        // 实际逻辑中应该有一个清理机制，或者在读取时判断 timestamp
+    }
+
+    /**
+     * 检查信号是否有效
+     */
+    public isSignalActive(maxAge: number = 3.0): boolean {
+        if (!this.activeSignal) return false;
+        return (GameRules.GetGameTime() - this.activeSignal.timestamp) < maxAge;
+    }
     public static get Instance() {
         if (!this.instance) this.instance = new Blackboard();
         return this.instance;
